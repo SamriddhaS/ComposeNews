@@ -31,13 +31,17 @@ fun CompNewsApp(
 
         ModalNavigationDrawer(
             drawerContent = {
-                // Here we add the drawer content...
                 AppDrawer(
-                    currentRoute =currentRoute,
-                    onNavigate = {},
+                    currentRoute = currentRoute,
+                    onNavigate = { destination -> navController.navigate(destination) },
                     closeDrawer = { coroutineScope.launch { drawerState.close() }  })
         }) {
             //Main content of the app
+            ComposeNewsNavGraph(
+                navController = navController,
+                openNavDrawer = { coroutineScope.launch { drawerState.open() } },
+                startDestination = HOME_ROUTE
+            )
 
         }
     }
