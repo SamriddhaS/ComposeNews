@@ -10,10 +10,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.composenews.ui.homeScreen.HomeScreenRoute
 
 @Composable
 fun ComposeNewsNavGraph(
     modifier: Modifier = Modifier,
+    isExpandedScreen: Boolean,
     navController: NavHostController = rememberNavController(),
     openNavDrawer:()->Unit,
     startDestination:String=CompNewsDestinations.HOME_ROUTE,
@@ -23,7 +25,10 @@ fun ComposeNewsNavGraph(
         composable(
             route = CompNewsDestinations.HOME_ROUTE
         ){
-            HomeScreen()
+            HomeScreenRoute(
+                openNavDrawer = openNavDrawer,
+                isExpandedScreen = isExpandedScreen
+            )
         }
         composable(
             route = CompNewsDestinations.INTEREST_ROUTE
@@ -32,16 +37,6 @@ fun ComposeNewsNavGraph(
         }
     }
 
-}
-
-@Composable
-fun HomeScreen() {
-    Scaffold {
-        val modifier = Modifier.padding(it)
-        Column(modifier = modifier) {
-            Text(text = "Text me plz : Home ")
-        }
-    }
 }
 
 @Composable

@@ -39,9 +39,10 @@ fun CompNewsApp(
             //Main content of the app
             ComposeNewsNavGraph(
                 navController = navController,
+                isExpandedScreen = isExpandedScreen,
                 openNavDrawer = { coroutineScope.launch { drawerState.open() } },
                 startDestination = HOME_ROUTE
-            )
+                )
 
         }
     }
