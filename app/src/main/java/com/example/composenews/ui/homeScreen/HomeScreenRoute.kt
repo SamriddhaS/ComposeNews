@@ -2,12 +2,16 @@ package com.example.composenews.ui.homeScreen
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,13 +24,17 @@ import androidx.compose.material3.TopAppBarState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.composenews.R
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun HomeScreenRoute(
@@ -74,6 +82,8 @@ fun HomeScreenWithList(
     ) -> Unit
 ) {
     val topAppBarState = rememberTopAppBarState()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(topAppBarState)
+
     Scaffold(
         topBar = {
             if(showTopAppBar){
@@ -83,11 +93,63 @@ fun HomeScreenWithList(
                 )
             }
         },
-        snackbarHost = {
-        },
+        snackbarHost = {  },
         modifier = modifier
     ) {
         val it = Modifier.padding(it)
+        val contentModifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        LoadingContent(
+            empty = false ,
+            emptyContent = { FullScreenLoading() },
+            loading = false ,
+            onRefresh = onRefreshPost
+        ) {
+
+        }
+
+    }
+}
+
+/**
+* LoadingContent composable handel's our swipe to refresh layout
+ * along with the empty content management.
+ * Display an initial empty state or swipe to refresh content.
+ *  @param empty (state) when true, display [emptyContent]
+ *  @param emptyContent (slot) the content to display for the empty state
+ *  @param loading (state) when true, display a loading spinner over [content]
+ *  @param onRefresh (event) event to request refresh
+ *  @param content (slot) the main content to show
+* */
+@Composable
+fun LoadingContent(
+    empty: Boolean,
+    emptyContent: @Composable () -> Unit,
+    loading: Boolean,
+    onRefresh: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    if (empty) {
+        emptyContent()
+    } else {
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(loading),
+            onRefresh = onRefresh,
+            content = content,
+        )
+    }
+}
+
+/**
+ * Full screen circular progress indicator
+ */
+@Composable
+private fun FullScreenLoading() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize(Alignment.Center)
+    ) {
+        CircularProgressIndicator()
     }
 }
 
