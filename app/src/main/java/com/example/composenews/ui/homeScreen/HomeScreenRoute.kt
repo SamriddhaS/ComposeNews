@@ -18,6 +18,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
@@ -32,17 +34,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.example.composenews.R
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun HomeScreenRoute(
+    uiState: HomeUiStates?,
     openNavDrawer:()->Unit,
     isExpandedScreen: Boolean,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     HomeFeedScreen(
+        uiState = uiState!!,
         openNavDrawer = openNavDrawer,
         isExpandedScreen = isExpandedScreen,
         snackbarHostState = snackbarHostState
@@ -51,18 +56,19 @@ fun HomeScreenRoute(
 
 @Composable
 fun HomeFeedScreen(
+    uiState: HomeUiStates,
     openNavDrawer:()->Unit,
     isExpandedScreen: Boolean,
     snackbarHostState: SnackbarHostState
 ) {
     HomeScreenWithList(
+        uiState = uiState,
         showTopAppBar = true,
         onRefreshPost = { /*TODO*/ },
         onErrorDismiss = {},
         openNavDrawer = openNavDrawer,
         snackbarHostState = snackbarHostState
-    ) {
-        contentPadding, modifier ->
+    ) { uiState,contentPadding, modifier ->
 
     }
 }
@@ -70,6 +76,7 @@ fun HomeFeedScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreenWithList(
+    uiState: HomeUiStates,
     showTopAppBar:Boolean,
     onRefreshPost:()->Unit,
     onErrorDismiss:(Long)->Unit,
@@ -77,6 +84,7 @@ fun HomeScreenWithList(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     hasPostContent:@Composable (
+        uiState: HomeUiStates.HasPosts,
         contentPadding: PaddingValues,
         modifier: Modifier
     ) -> Unit
@@ -95,16 +103,48 @@ fun HomeScreenWithList(
         },
         snackbarHost = {  },
         modifier = modifier
-    ) {
-        val it = Modifier.padding(it)
+    ) { innerPadding ->
         val contentModifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
         LoadingContent(
-            empty = false ,
+            empty = when(uiState){
+                is HomeUiStates.HasPosts -> false
+                is HomeUiStates.NoPosts -> uiState.isLoading
+                                 } ,
             emptyContent = { FullScreenLoading() },
-            loading = false ,
+            loading = uiState.isLoading ,
             onRefresh = onRefreshPost
         ) {
+            when(uiState){
+                is HomeUiStates.NoPosts -> {
+                    if (uiState.errorMessages.isEmpty()){
+                        // if there are no posts, and no error, let the user refresh manually
+                        TextButton(
+                            onClick = onRefreshPost,
+                            modifier.padding(innerPadding).fillMaxSize()
+                        ) {
+                            Text(
+                                "Tap to load content",
+                                textAlign = TextAlign.Center
+                            )
+                        }
 
+                    }else{
+                        // there's currently an error showing, no need to show any content
+                        Box(
+                            contentModifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                        )
+                    }
+                }
+                is HomeUiStates.HasPosts -> {
+                    hasPostContent(
+                        uiState = uiState,
+                        contentPadding = innerPadding,
+                        modifier = contentModifier
+                    )
+                }
+            }
         }
 
     }
