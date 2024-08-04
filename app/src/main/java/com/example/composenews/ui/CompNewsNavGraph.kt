@@ -26,7 +26,7 @@ fun ComposeNewsNavGraph(
             route = CompNewsDestinations.HOME_ROUTE
         ){
             HomeScreenRoute(
-                uiState = null,
+                homeViewModel = null,
                 openNavDrawer = openNavDrawer,
                 isExpandedScreen = isExpandedScreen
             )
