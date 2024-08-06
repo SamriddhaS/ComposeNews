@@ -13,6 +13,7 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.composenews.data.StaticPostRepository
 import com.example.composenews.ui.CompNewsApp
 import com.example.composenews.ui.theme.ComposeNewsTheme
 
@@ -23,7 +24,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val widthSizeClass = calculateWindowSizeClass(activity = this@MainActivity).widthSizeClass
-            CompNewsApp(widthSizeClass = widthSizeClass)
+            CompNewsApp(
+                widthSizeClass = widthSizeClass,
+                postsRepository = StaticPostRepository()
+            )
         }
     }
 }

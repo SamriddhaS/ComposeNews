@@ -12,12 +12,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.composenews.data.PostsRepository
 import com.example.composenews.ui.CompNewsDestinations.HOME_ROUTE
 import com.example.composenews.ui.theme.ComposeNewsTheme
 import kotlinx.coroutines.launch
 
 @Composable
 fun CompNewsApp(
+    postsRepository: PostsRepository,
     widthSizeClass: WindowWidthSizeClass
 ) {
     ComposeNewsTheme {
@@ -38,6 +40,7 @@ fun CompNewsApp(
         }) {
             //Main content of the app
             ComposeNewsNavGraph(
+                postsRepository = postsRepository,
                 navController = navController,
                 isExpandedScreen = isExpandedScreen,
                 openNavDrawer = { coroutineScope.launch { drawerState.open() } },

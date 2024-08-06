@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -43,34 +44,55 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 @Composable
 fun HomeScreenRoute(
-    homeViewModel: HomeViewModel?,
-    openNavDrawer:()->Unit,
+    uiState: HomeUiStates,
     isExpandedScreen: Boolean,
+    onToggleFavorite: (String) -> Unit,
+    onSelectPost: (String) -> Unit,
+    onRefreshPosts: () -> Unit,
+    onErrorDismiss: (Long) -> Unit,
+    onInteractWithFeed: () -> Unit,
+    onInteractWithArticleDetails: (String) -> Unit,
+    onSearchInputChanged: (String) -> Unit,
+    openNavDrawer:()->Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
-    val uiState by homeViewModel?.uiState?.collectAsStateWithLifecycle()!!
     HomeFeedScreen(
         uiState = uiState,
-        openNavDrawer = openNavDrawer,
-        isExpandedScreen = isExpandedScreen,
-        snackbarHostState = snackbarHostState
+        showTopAppBar = !isExpandedScreen,
+        onToggleFavorite = onToggleFavorite,
+        onSelectPost = onSelectPost,
+        onRefreshPosts = onRefreshPosts,
+        onErrorDismiss = onErrorDismiss,
+        openDrawer = openNavDrawer,
+        homeListLazyListState = null,
+        snackbarHostState = snackbarHostState,
+        onSearchInputChanged = onSearchInputChanged
     )
 }
 
 @Composable
 fun HomeFeedScreen(
     uiState: HomeUiStates,
-    openNavDrawer:()->Unit,
-    isExpandedScreen: Boolean,
-    snackbarHostState: SnackbarHostState
+    showTopAppBar: Boolean,
+    onToggleFavorite: (String) -> Unit,
+    onSelectPost: (String) -> Unit,
+    onRefreshPosts: () -> Unit,
+    onErrorDismiss: (Long) -> Unit,
+    openDrawer: () -> Unit,
+    homeListLazyListState: LazyListState?,
+    snackbarHostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+    searchInput: String = "",
+    onSearchInputChanged: (String) -> Unit,
 ) {
     HomeScreenWithList(
         uiState = uiState,
-        showTopAppBar = true,
-        onRefreshPost = { /*TODO*/ },
-        onErrorDismiss = {},
-        openNavDrawer = openNavDrawer,
-        snackbarHostState = snackbarHostState
+        showTopAppBar = showTopAppBar,
+        onRefreshPost = onRefreshPosts,
+        onErrorDismiss = onErrorDismiss,
+        openNavDrawer = openDrawer,
+        snackbarHostState = snackbarHostState,
+        modifier = modifier
     ) { uiState,contentPadding, modifier ->
 
     }
@@ -141,11 +163,7 @@ fun HomeScreenWithList(
                     }
                 }
                 is HomeUiStates.HasPosts -> {
-                    hasPostContent(
-                        uiState = uiState,
-                        contentPadding = innerPadding,
-                        modifier = contentModifier
-                    )
+                    hasPostContent(uiState,innerPadding,contentModifier)
                 }
             }
         }
