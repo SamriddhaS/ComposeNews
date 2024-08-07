@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -26,8 +27,10 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.TopAppBarState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -49,7 +52,7 @@ fun HomeScreenRoute(
     onToggleFavorite: (String) -> Unit,
     onSelectPost: (String) -> Unit,
     onRefreshPosts: () -> Unit,
-    onErrorDismiss: (Long) -> Unit,
+    onErrorDismiss: (String) -> Unit,
     onInteractWithFeed: () -> Unit,
     onInteractWithArticleDetails: (String) -> Unit,
     onSearchInputChanged: (String) -> Unit,
@@ -77,7 +80,7 @@ fun HomeFeedScreen(
     onToggleFavorite: (String) -> Unit,
     onSelectPost: (String) -> Unit,
     onRefreshPosts: () -> Unit,
-    onErrorDismiss: (Long) -> Unit,
+    onErrorDismiss: (String) -> Unit,
     openDrawer: () -> Unit,
     homeListLazyListState: LazyListState?,
     snackbarHostState: SnackbarHostState,
@@ -104,7 +107,7 @@ fun HomeScreenWithList(
     uiState: HomeUiStates,
     showTopAppBar:Boolean,
     onRefreshPost:()->Unit,
-    onErrorDismiss:(Long)->Unit,
+    onErrorDismiss:(String)->Unit,
     openNavDrawer:()->Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -126,7 +129,7 @@ fun HomeScreenWithList(
                 )
             }
         },
-        snackbarHost = {  },
+        snackbarHost = { SnackBarHost(hostState = snackbarHostState) },
         modifier = modifier
     ) { innerPadding ->
         val contentModifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -145,7 +148,9 @@ fun HomeScreenWithList(
                         // if there are no posts, and no error, let the user refresh manually
                         TextButton(
                             onClick = onRefreshPost,
-                            modifier.padding(innerPadding).fillMaxSize()
+                            modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
                         ) {
                             Text(
                                 "Tap to load content",
@@ -169,6 +174,32 @@ fun HomeScreenWithList(
         }
 
     }
+
+    if (uiState.errorMessages.isNotEmpty()){
+        val errorMessageText = remember(uiState) { uiState.errorMessages[0].messageId }
+        val retryText = "Retry"
+
+        // If onRefreshPosts or onErrorDismiss change while the LaunchedEffect is running,
+        // don't restart the effect and use the latest lambda values.
+        val onRefreshPostsState by rememberUpdatedState(onRefreshPost)
+        val onErrorDismissState by rememberUpdatedState(onErrorDismiss)
+
+        LaunchedEffect(errorMessageText, retryText, snackbarHostState) {
+            val snackResult = snackbarHostState.showSnackbar(
+                message = errorMessageText,
+                actionLabel = retryText
+            )
+
+            if (snackResult== SnackbarResult.ActionPerformed){
+                onRefreshPostsState()
+            }
+
+            onErrorDismissState(errorMessageText)
+        }
+
+    }
+
+
 }
 
 /**
