@@ -96,7 +96,10 @@ class HomeViewModel(
     )
 
     val uiState = viewModelState
-        .map(HomeViewModelState::toUiState)
+        .map{
+            homeViewModelState ->
+            homeViewModelState.toUiState()
+        }
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
