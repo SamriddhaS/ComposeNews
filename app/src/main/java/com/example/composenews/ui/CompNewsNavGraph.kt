@@ -35,7 +35,7 @@ fun ComposeNewsNavGraph(
             val homeViewModel: HomeViewModel = viewModel(
                 factory = HomeViewModel.provideFactory(
                     postsRepository = postsRepository,
-                    preSelectedPostId = ""/*navBackStackEntry.arguments?.getString(POST_ID)*/
+                    preSelectedPostId = navBackStackEntry.arguments?.getString(POST_ID)
                 )
             )
 

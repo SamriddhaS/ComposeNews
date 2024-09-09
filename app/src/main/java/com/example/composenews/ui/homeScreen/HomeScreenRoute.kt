@@ -1,5 +1,6 @@
 package com.example.composenews.ui.homeScreen
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -8,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -40,10 +43,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.composenews.R
+import com.example.composenews.models.Post
+import com.example.composenews.models.PostsFeed
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlin.math.log
 
 @Composable
 fun HomeScreenRoute(
@@ -59,6 +66,9 @@ fun HomeScreenRoute(
     openNavDrawer:()->Unit,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
+
+    val homeListLazyListState = rememberLazyListState()
+
     HomeFeedScreen(
         uiState = uiState,
         showTopAppBar = !isExpandedScreen,
@@ -67,7 +77,7 @@ fun HomeScreenRoute(
         onRefreshPosts = onRefreshPosts,
         onErrorDismiss = onErrorDismiss,
         openDrawer = openNavDrawer,
-        homeListLazyListState = null,
+        homeListLazyListState = homeListLazyListState,
         snackbarHostState = snackbarHostState,
         onSearchInputChanged = onSearchInputChanged
     )
@@ -82,7 +92,7 @@ fun HomeFeedScreen(
     onRefreshPosts: () -> Unit,
     onErrorDismiss: (String) -> Unit,
     openDrawer: () -> Unit,
-    homeListLazyListState: LazyListState?,
+    homeListLazyListState: LazyListState,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     searchInput: String = "",
@@ -96,9 +106,70 @@ fun HomeFeedScreen(
         openNavDrawer = openDrawer,
         snackbarHostState = snackbarHostState,
         modifier = modifier
-    ) { uiState,contentPadding, modifier ->
+    ) { uiStateHasPost,contentPadding, modifier ->
+
+        HomePostList(
+            uiStateHasPost.postsFeed,
+            uiStateHasPost.favorites,
+            !showTopAppBar,
+            onToggleFavorite,
+            onSelectPost,
+            contentPadding,
+            homeListLazyListState,
+            searchInput,
+            onSearchInputChanged,
+            modifier
+        )
+    }
+}
+
+@Composable
+fun HomePostList(
+    postsFeed: PostsFeed,
+    favorites: Set<String>,
+    showTopAppBar: Boolean,
+    onToggleFavorite: (String) -> Unit,
+    onSelectPost: (postId: String) -> Unit,
+    contentPadding: PaddingValues,
+    homeListLazyListState: LazyListState = rememberLazyListState(),
+    searchInput: String,
+    onSearchInputChanged: (String) -> Unit,
+    modifier: Modifier
+) {
+
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = contentPadding,
+        state = homeListLazyListState
+    ) {
+
+        if (showTopAppBar){
+            /**
+            * TODO : Added search bar for expanded screens
+            * */
+            item {
+
+            }
+        }
+
+        /**
+        * Top Stories section
+        * */
+        item {
+            PostListTopStoriesSection(postsFeed.highlightedPost,onSelectPost)
+        }
+
 
     }
+}
+
+@Composable
+private fun PostListTopStoriesSection(highlightedPost: Post, onSelectPost: (postId: String) -> Unit) {
+    Text(
+        modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
+        text = "Highlighted Stories For You...",
+        style = MaterialTheme.typography.titleMedium
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

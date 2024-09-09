@@ -1,9 +1,11 @@
 package com.example.composenews.ui.homeScreen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.composenews.data.PostsRepository
+import com.example.composenews.data.Result
 import com.example.composenews.models.ErrorMessage
 import com.example.composenews.models.Post
 import com.example.composenews.models.PostsFeed
@@ -11,6 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlin.math.log
 
 sealed interface HomeUiStates {
     val isLoading: Boolean
@@ -91,12 +96,48 @@ class HomeViewModel(
     )
 
     val uiState = viewModelState
-        .map { HomeViewModelState().toUiState() }
+        .map(HomeViewModelState::toUiState)
         .stateIn(
             viewModelScope,
             SharingStarted.Eagerly,
             viewModelState.value.toUiState()
         )
+
+
+    init {
+        refreshPost()
+
+        // Observe for favorite changes in the repo layer
+        viewModelScope.launch {
+            postsRepository?.observeFavorites()?.collect { favorites ->
+                viewModelState.update { it.copy(favorites = favorites) }
+            }
+        }
+    }
+
+    fun refreshPost(){
+        viewModelState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            val result = postsRepository?.getPostsFeed()
+            viewModelState.update {
+                when(result){
+                    is Result.Success -> {
+                        Log.d("{HOMEViewModel}", "refreshPost: ${result.data}")
+                        it.copy(postsFeed = result.data, isLoading = false)
+
+                    }
+                    is Result.Error -> {
+                        val errorMsg = it.errorMessages
+                        HomeViewModelState(errorMessages = errorMsg, isLoading = false)
+                        //it.copy(errorMessages = errorMsg, isLoading = false)
+                    }
+                    null -> TODO()
+                }
+            }
+        }
+    }
+
+
 
     companion object {
         fun provideFactory(
