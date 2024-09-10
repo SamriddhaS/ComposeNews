@@ -3,10 +3,14 @@ package com.example.composenews.ui.homeScreen
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -36,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -43,11 +50,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.composenews.R
+import com.example.composenews.data.posts
 import com.example.composenews.models.Post
 import com.example.composenews.models.PostsFeed
+import com.example.composenews.ui.theme.ComposeNewsTheme
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlin.math.log
@@ -153,10 +163,19 @@ fun HomePostList(
         }
 
         /**
-        * Top Stories section
+        * Highlighted Stories Section
         * */
         item {
-            PostListTopStoriesSection(postsFeed.highlightedPost,onSelectPost)
+            PostListHighlightedStoriesSection(postsFeed.highlightedPost,onSelectPost)
+        }
+
+        /**
+        * Recommended Stories Section
+        * */
+        if(postsFeed.recommendedPosts.isNotEmpty()){
+            item{
+                
+            }
         }
 
 
@@ -164,11 +183,66 @@ fun HomePostList(
 }
 
 @Composable
-private fun PostListTopStoriesSection(highlightedPost: Post, onSelectPost: (postId: String) -> Unit) {
+private fun PostListHighlightedStoriesSection(highlightedPost: Post, onSelectPost: (postId: String) -> Unit) {
     Text(
         modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
-        text = "Highlighted Stories For You...",
-        style = MaterialTheme.typography.titleMedium
+        text = "Highlighted Stories For You",
+        style = MaterialTheme.typography.titleLarge
+    )
+    TopStoriesCard(
+        highlightedPost,
+        Modifier.clickable { onSelectPost(highlightedPost.id) }
+    )
+
+    PostListDivider()
+}
+
+@Composable
+fun TopStoriesCard(highlightedPost: Post, modifier: Modifier = Modifier) {
+    val typography = MaterialTheme.typography
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+
+        val imageModifier = Modifier
+            .height(200.dp)
+            .fillMaxWidth()
+            .clip(shape = MaterialTheme.shapes.medium)
+
+        Image(
+            painter = painterResource(id = highlightedPost.imageId),
+            contentDescription = "",
+            modifier = imageModifier,
+            contentScale = ContentScale.Crop
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = highlightedPost.title,
+            style = typography.titleLarge,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+        Text(
+            text = highlightedPost.metadata.author.name,
+            style = typography.labelLarge,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        Text(
+            text = "${highlightedPost.metadata.date} - ${highlightedPost.metadata.readTimeMinutes} min read",
+            style = typography.bodySmall
+        )
+
+    }
+}
+
+@Composable
+private fun PostListDivider() {
+    Divider(
+        modifier = Modifier.padding(horizontal = 14.dp),
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
     )
 }
 
@@ -361,4 +435,15 @@ fun TopAppBarState(
         scrollBehavior = scrollBehavior,
         modifier = modifier
     )
+}
+
+
+@Preview
+@Composable
+fun PostCardTopPreview() {
+    ComposeNewsTheme {
+        Surface {
+            TopStoriesCard(posts.highlightedPost)
+        }
+    }
 }
