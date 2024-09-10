@@ -174,76 +174,16 @@ fun HomePostList(
         * */
         if(postsFeed.recommendedPosts.isNotEmpty()){
             item{
-                
+                PostListRecommendedSection(
+                    recommendedPostsList = postsFeed.recommendedPosts,
+                    onSelectPost,
+                    favorites,
+                    onToggleFavorite
+                )
             }
         }
 
-
     }
-}
-
-@Composable
-private fun PostListHighlightedStoriesSection(highlightedPost: Post, onSelectPost: (postId: String) -> Unit) {
-    Text(
-        modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
-        text = "Highlighted Stories For You",
-        style = MaterialTheme.typography.titleLarge
-    )
-    TopStoriesCard(
-        highlightedPost,
-        Modifier.clickable { onSelectPost(highlightedPost.id) }
-    )
-
-    PostListDivider()
-}
-
-@Composable
-fun TopStoriesCard(highlightedPost: Post, modifier: Modifier = Modifier) {
-    val typography = MaterialTheme.typography
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-
-        val imageModifier = Modifier
-            .height(200.dp)
-            .fillMaxWidth()
-            .clip(shape = MaterialTheme.shapes.medium)
-
-        Image(
-            painter = painterResource(id = highlightedPost.imageId),
-            contentDescription = "",
-            modifier = imageModifier,
-            contentScale = ContentScale.Crop
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        Text(
-            text = highlightedPost.title,
-            style = typography.titleLarge,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        Text(
-            text = highlightedPost.metadata.author.name,
-            style = typography.labelLarge,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
-        Text(
-            text = "${highlightedPost.metadata.date} - ${highlightedPost.metadata.readTimeMinutes} min read",
-            style = typography.bodySmall
-        )
-
-    }
-}
-
-@Composable
-private fun PostListDivider() {
-    Divider(
-        modifier = Modifier.padding(horizontal = 14.dp),
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
-    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -435,15 +375,4 @@ fun TopAppBarState(
         scrollBehavior = scrollBehavior,
         modifier = modifier
     )
-}
-
-
-@Preview
-@Composable
-fun PostCardTopPreview() {
-    ComposeNewsTheme {
-        Surface {
-            TopStoriesCard(posts.highlightedPost)
-        }
-    }
 }
