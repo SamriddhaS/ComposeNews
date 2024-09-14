@@ -91,10 +91,15 @@ fun RecommendedPostListItem(
 
         Icon(
             imageVector = if (isFavorite) Icons.Filled.Bookmark else Icons.Filled.BookmarkBorder,
-            contentDescription = null // handled by click label of parent
+            contentDescription = null, // handled by click label of parent
+            modifier = Modifier.padding(16.dp)
+                .clickable {
+                    onToggleFavorite()
+                }
         )
-
     }
+
+    PostListDivider()
 }
 
 

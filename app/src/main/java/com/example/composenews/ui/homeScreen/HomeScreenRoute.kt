@@ -183,6 +183,18 @@ fun HomePostList(
             }
         }
 
+        /**
+        * Popular posts Section
+        * */
+        if(!postsFeed.popularPosts.isNullOrEmpty()){
+            item {
+                PostListPopularSection(
+                    postsFeed.popularPosts,
+                    onSelectPost
+                )
+            }
+        }
+
     }
 }
 
