@@ -195,6 +195,19 @@ fun HomePostList(
             }
         }
 
+        /**
+        * Recent Posts
+        * */
+        if(!postsFeed.recentPosts.isNullOrEmpty()){
+            item {
+                PostsListRecentPostUi(
+                    postsFeed.recentPosts,
+                    onSelectPost
+                )
+            }
+        }
+
+
     }
 }
 
