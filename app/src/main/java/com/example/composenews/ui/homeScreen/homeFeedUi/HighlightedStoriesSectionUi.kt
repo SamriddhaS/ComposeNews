@@ -1,4 +1,4 @@
-package com.example.composenews.ui.homeScreen
+package com.example.composenews.ui.homeScreen.homeFeedUi
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

@@ -140,7 +140,41 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Notify that an error was displayed on the screen
+     */
+    fun errorShown(errorId: String) {
+        viewModelState.update { currentUiState ->
+            val errorMessages = currentUiState.errorMessages.filterNot { it.id == errorId }
+            currentUiState.copy(errorMessages = errorMessages)
+        }
+    }
 
+    /**
+     * Toggle favorite of a post
+     */
+    fun toggleFavourite(postId: String) {
+        viewModelScope.launch {
+            postsRepository?.toggleFavorite(postId)
+        }
+    }
+
+    fun selectArticle(postId: String) {
+        // Treat selecting a detail as simply interacting with it
+        interactedWithArticleDetails(postId)
+    }
+
+    /**
+     * Notify that the user interacted with the article details
+     */
+    fun interactedWithArticleDetails(postId: String) {
+        viewModelState.update {
+            it.copy(
+                selectedPostId = postId,
+                isArticleOpen = true
+            )
+        }
+    }
 
     companion object {
         fun provideFactory(
