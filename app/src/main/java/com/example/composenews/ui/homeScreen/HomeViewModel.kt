@@ -176,6 +176,12 @@ class HomeViewModel(
         }
     }
 
+    fun interactedWithFeed() {
+        viewModelState.update {
+            it.copy(isArticleOpen = false)
+        }
+    }
+
     companion object {
         fun provideFactory(
             postsRepository: PostsRepository,

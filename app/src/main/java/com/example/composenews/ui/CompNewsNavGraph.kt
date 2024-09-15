@@ -48,7 +48,7 @@ fun ComposeNewsNavGraph(
                 onSelectPost = { homeViewModel.selectArticle(it) },
                 onRefreshPosts = { homeViewModel.refreshPost() },
                 onErrorDismiss = { homeViewModel.errorShown(it) },
-                onInteractWithFeed = {},
+                onInteractWithFeed = { homeViewModel.interactedWithFeed() },
                 onInteractWithArticleDetails = {},
                 onSearchInputChanged = {},
                 openNavDrawer = openNavDrawer

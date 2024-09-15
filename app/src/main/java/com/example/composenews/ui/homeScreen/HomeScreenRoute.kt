@@ -1,6 +1,7 @@
 package com.example.composenews.ui.homeScreen
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,6 +32,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -42,7 +44,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import com.example.composenews.R
+import com.example.composenews.models.Post
 import com.example.composenews.models.PostsFeed
+import com.example.composenews.ui.homeScreen.homeArticleDetailsUi.ArticleDetailsUi
 import com.example.composenews.ui.homeScreen.homeFeedUi.HomeFeedScreen
 import com.example.composenews.ui.homeScreen.homeFeedUi.PostListHighlightedStoriesSection
 import com.example.composenews.ui.homeScreen.homeFeedUi.PostListPopularSection
@@ -103,6 +107,15 @@ fun HomeScreenRoute(
         uiState = uiState
     )
 
+    val articleDetailLazyListStates = when (uiState) {
+        is HomeUiStates.HasPosts -> uiState.postsFeed.allPosts
+        is HomeUiStates.NoPosts -> emptyList()
+    }.associate { post ->
+        key(post.id) {
+            post.id to rememberLazyListState()
+        }
+    }
+
     when(loadHomeScreenType){
         HomeScreenType.JustFeed -> {
             HomeFeedScreen(
@@ -119,6 +132,25 @@ fun HomeScreenRoute(
             )
         }
         HomeScreenType.ArticleDetails -> {
+
+            check(uiState is HomeUiStates.HasPosts)
+
+            ArticleDetailsUi(
+                post = uiState.selectedPost,
+                isExpandedScreen = isExpandedScreen,
+                onBack = onInteractWithFeed,
+                isFavorite = uiState.favorites.contains(uiState.selectedPost.id),
+                onToggleFavorite = {
+                    onToggleFavorite(uiState.selectedPost.id)
+                },
+                lazyListState = articleDetailLazyListStates.getValue(
+                    uiState.selectedPost.id
+                )
+            )
+
+            BackHandler {
+                onInteractWithFeed()
+            }
 
         }
         HomeScreenType.FeedWithArticleDetails -> {
