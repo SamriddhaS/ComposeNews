@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package com.example.composenews.data
+package com.example.composenews.data.posts
+import com.example.composenews.data.Result
 import com.example.composenews.models.Post
 import com.example.composenews.models.PostsFeed
 import com.example.composenews.utils.addOrRemove

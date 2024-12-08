@@ -3,16 +3,15 @@ package com.example.composenews.ui
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.composenews.data.PostsRepository
+import com.example.composenews.data.interests.InterestRepository
+import com.example.composenews.data.posts.PostsRepository
 import com.example.composenews.ui.CompNewsDestinations.HOME_ROUTE
 import com.example.composenews.ui.theme.ComposeNewsTheme
 import kotlinx.coroutines.launch
@@ -20,6 +19,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CompNewsApp(
     postsRepository: PostsRepository,
+    interestRepository: InterestRepository,
     widthSizeClass: WindowWidthSizeClass
 ) {
     ComposeNewsTheme {
@@ -41,6 +41,7 @@ fun CompNewsApp(
             //Main content of the app
             ComposeNewsNavGraph(
                 postsRepository = postsRepository,
+                interestRepository = interestRepository,
                 navController = navController,
                 isExpandedScreen = isExpandedScreen,
                 openNavDrawer = { coroutineScope.launch { drawerState.open() } },

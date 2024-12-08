@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.composenews.data.PostsRepository
+import com.example.composenews.data.posts.PostsRepository
 import com.example.composenews.data.Result
 import com.example.composenews.models.ErrorMessage
 import com.example.composenews.models.Post
@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 sealed interface HomeUiStates {
     val isLoading: Boolean

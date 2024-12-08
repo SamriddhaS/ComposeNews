@@ -20,7 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.composenews.data.posts
+import com.example.composenews.data.posts.posts
 import com.example.composenews.models.Post
 import com.example.composenews.ui.theme.ComposeNewsTheme
 

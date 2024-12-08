@@ -1,7 +1,8 @@
 package com.example.composenews.ui.homeScreen.homeArticleDetailsUi
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.ColorFilter
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -49,9 +50,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -69,9 +70,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composenews.R
-import com.example.composenews.data.BlockingFakePostsRepository
-import com.example.composenews.data.StaticPostRepository
-import com.example.composenews.data.post3
+import com.example.composenews.data.posts.BlockingFakePostsRepository
+import com.example.composenews.data.posts.StaticPostRepository
+import com.example.composenews.data.posts.post3
 import com.example.composenews.models.Markup
 import com.example.composenews.models.MarkupType
 import com.example.composenews.models.Paragraph
@@ -99,6 +100,7 @@ fun ArticleDetailsUi(
 
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(topAppBarState)
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -124,7 +126,7 @@ fun ArticleDetailsUi(
                     actions = {
                         FavoriteButton(onClick = { })
                         BookmarkButton(isBookmarked = isFavorite, onClick = onToggleFavorite)
-                        ShareButton(onClick = { })
+                        ShareButton(onClick = { sharePost(post, context = context) })
                         TextSettingsButton(onClick = { })
                     }
                 )
@@ -466,6 +468,25 @@ fun TextSettingsButton(onClick: () -> Unit) {
             contentDescription = ""
         )
     }
+}
+
+/**
+* Show share intent when clicked on share buttons on details screen.
+ * @param post : the post you want to share.
+ * @param context : android context - activity context, application context.
+* */
+fun sharePost(post: Post, context: Context) {
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TITLE, post.title)
+        putExtra(Intent.EXTRA_TEXT, post.url)
+    }
+    context.startActivity(
+        Intent.createChooser(
+            intent,
+            "Share this post."
+        )
+    )
 }
 
 

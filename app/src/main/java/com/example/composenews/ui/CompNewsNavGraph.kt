@@ -13,14 +13,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.composenews.data.PostsRepository
+import com.example.composenews.data.interests.InterestRepository
+import com.example.composenews.data.posts.PostsRepository
 import com.example.composenews.ui.homeScreen.HomeScreenRoute
 import com.example.composenews.ui.homeScreen.HomeViewModel
+import com.example.composenews.ui.interestsScreen.InterestRoute
+import com.example.composenews.ui.interestsScreen.InterestViewModel
 
 const val POST_ID = "postId"
 @Composable
 fun ComposeNewsNavGraph(
     postsRepository: PostsRepository,
+    interestRepository: InterestRepository,
     modifier: Modifier = Modifier,
     isExpandedScreen: Boolean,
     navController: NavHostController = rememberNavController(),
@@ -57,18 +61,16 @@ fun ComposeNewsNavGraph(
         composable(
             route = CompNewsDestinations.INTEREST_ROUTE
         ){
-            InterestScreen()
+            val interestsViewModel: InterestViewModel = viewModel(
+                factory = InterestViewModel.provideFactory(interestsRepository = interestRepository)
+            )
+
+            InterestRoute(
+                interestsViewModel,
+                openDrawer = {}
+            )
+
         }
     }
 
-}
-
-@Composable
-fun InterestScreen() {
-    Scaffold {
-        val modifier = Modifier.padding(it)
-        Column(modifier = modifier) {
-            Text(text = "Text me plz : Interest ")
-        }
-    }
 }

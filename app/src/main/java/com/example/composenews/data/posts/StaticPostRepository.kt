@@ -1,5 +1,6 @@
-package com.example.composenews.data
+package com.example.composenews.data.posts
 
+import com.example.composenews.data.Result
 import com.example.composenews.models.Post
 import com.example.composenews.models.PostsFeed
 import com.example.composenews.utils.addOrRemove
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
-class StaticPostRepository:PostsRepository {
+class StaticPostRepository: PostsRepository {
 
     /*
     * For time being we are storing data in memory because we don't have db or api yet

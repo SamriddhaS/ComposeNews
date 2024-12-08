@@ -1,6 +1,6 @@
 
 @file:Suppress("ktlint:max-line-length") // String constants read better
-package com.example.composenews.data
+package com.example.composenews.data.posts
 
 import com.example.composenews.R
 import com.example.composenews.models.Markup

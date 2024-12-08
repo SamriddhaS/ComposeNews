@@ -1,4 +1,5 @@
-package com.example.composenews.data
+package com.example.composenews.data.posts
+import com.example.composenews.data.Result
 import com.example.composenews.models.Post
 import com.example.composenews.models.PostsFeed
 import kotlinx.coroutines.flow.Flow
